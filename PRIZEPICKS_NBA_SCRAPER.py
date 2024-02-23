@@ -9,19 +9,22 @@ import pandas as pd
 
 '''
 Change self.directory to the folder where typical downloads go to. end the directory in projections.json
-github API: https://github.com/auroradan/PrizePicks-Prop-Finder/blob/main/README.md00
 '''
 
 class PRIZEPICKS_NBA_SCRAPER():
     def __init__(self):
-        self.directory = "C:\\Users\\jakem\\Downloads\\projections.json"
+
+        self.directory = "C:\\Users\\x\\x\\projections.json"
         self.lines = []
         self.getJSON()
         self.load()
         df = pd.DataFrame(self.lines, columns=['Name','Type','Line'])
+
+        # save to
         df.to_csv('lines.csv', index=False)
 
     def getJSON(self):
+        # navigate to the page in order to retrieve JSON with lines for the day
         url = "https://api.prizepicks.com/projections?league_id=7"
         driver = webdriver.Firefox()
         driver.get(url)
@@ -42,6 +45,8 @@ class PRIZEPICKS_NBA_SCRAPER():
         seive = {"points", "rebounds", "assists", "threes", "blocks", "steals", "pra", "pr", "pa", "ra"}
         with open(self.directory, 'r') as file:
             json_data = json.load(file)
+
+        # parse through the returned JSON to scrape the players lines
         player_names = {elem["id"]: elem["attributes"]["name"]
                         for elem in json_data["included"]
                         if elem["type"] == "new_player"}
@@ -62,6 +67,7 @@ class PRIZEPICKS_NBA_SCRAPER():
         self.lines = player_projections
 
     def statType(self, stat):
+        # find the stat retrieved
         match stat:
             case "Pts+Rebs+Asts":
                 return "pra"

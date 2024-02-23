@@ -15,12 +15,12 @@ data_file = 'lines.csv'
 df = pd.read_csv(data_file, header=0)
 
 df = df[df.Type == 'points']
+# get the names of the players for the day
 names = df.Name.values.tolist()
-
-print(df)
 
 current_season = '2023-24'
 
+# load endpoints
 team_stats = leaguedashteamstats.LeagueDashTeamStats(
     season=current_season,
     per_mode_detailed='PerGame',
@@ -43,6 +43,7 @@ timestr = time.strftime("%Y%m%d")
 f = open('projections\\todays_player_data'+timestr+'.csv', 'w', newline='')
 data = csv.writer(f)
 
+# write column names
 data.writerow(['SEASON AVG FG_PCT', 'SEASON AVG FG3_PCT', 'SEASON AVG FT_PCT', 'SEASON AVG OREB',
                'SEASON AVG REB', 'SEASON AVG AST', 'SEASON AVG TOV', 'SEASON AVG STL', 'SEASON AVG PF',
                'SEASON AVG PFD', 'SEASON AVG PLUS_MINUS', '5 GM PTS', '10 GM PTS', 'SEASON AVG PTS',
@@ -51,6 +52,7 @@ data.writerow(['SEASON AVG FG_PCT', 'SEASON AVG FG3_PCT', 'SEASON AVG FT_PCT', '
                'SEASON AVG TS', 'SEASON AVG EFG'])
 row = []
 
+# iterate through the names to load the current season data through endpoints
 for name in names:
     time.sleep(1)
 
@@ -115,14 +117,17 @@ for name in names:
     pinp = team_stats.loc[team_stats['TEAM_ID'] == vs_team_id]['OPP_PTS_PAINT'].values[0]
     row.append(pinp)
 
+    # true shooting percentage
     game_log = game_log.assign(TS=lambda x: x['PTS'] / (2 * (x['FGA'] + (0.44 * x['FTA']))))
     game_log['SEASON AVG TS'] = game_log['TS'].mean()
     row.append(game_log['SEASON AVG TS'].iloc[0])
 
+    # calculate effective field goal range this year
     game_log = game_log.assign(eFG=lambda x: (x['FGM'] + 0.5 * x['FG3M']) / x['FGA'])
     game_log['SEASON AVG EFG'] = game_log['eFG'].mean()
     row.append(game_log['SEASON AVG EFG'].iloc[0])
 
+    # if enough data is in the row
     if (len(row) > 5):
         data.writerow(row)
     row = []

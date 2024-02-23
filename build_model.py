@@ -9,23 +9,27 @@ from keras.models import Sequential
 from keras.layers import Dense, Dropout
 import pickle
 
-
+# read scraped player data
 data_file = 'player_data.csv'
 df = pd.read_csv(data_file, header=0)
 
+# drop whitespace, nulls, and initial index column
 df.columns = df.columns.str.strip()
 df = df.dropna()
 df = df.loc[:, ~df.columns.str.contains('^Unnamed')]
 
+# dropping points from x dataset, adding to y
 x = df.drop(['PTS'], axis=1)
 y = df['PTS']
 
-x_train, x_test, y_train, y_test = train_test_split(x, y, test_size = 0.01)
+# splitting data into train test data
+x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.01)
 
-
+# get column names
 cols = x_train.columns
 scaler = StandardScaler()
 
+# transform data
 x_train = scaler.fit_transform(x_train)
 x_test = scaler.transform(x_test)
 
@@ -52,12 +56,14 @@ print('MLP')
 print('Mean Absolute Error: ', mae)
 print('R2: ', r2)
 '''
-# SVM vs SVR???????
+
+# build model, fit, and predict
 # svc = SVC()
 svc = SVR()
 svc.fit(x_train, y_train)
 svm_y_pred = svc.predict(x_test)
 
+# performance metrics
 mae = mean_absolute_error(y_test, svm_y_pred)
 r2 = r2_score(y_test, svm_y_pred)
 
