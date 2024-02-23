@@ -13,3 +13,9 @@ With scraping new data using the NBA API endpoint and building model fresh:
 1. Run stat_scrape_v2.py
 2. Run build_model.py
 3. Follow same 4 steps listed above
+
+
+
+
+PrizePicks scraper was based on part of this GitHub repo: https://github.com/auroradan/PrizePicks-Prop-Finder/blob/main/README.md00
+NBA endpoints used are from this repo: https://github.com/swar/nba_api
